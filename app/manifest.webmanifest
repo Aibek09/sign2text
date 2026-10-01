@@ -1,0 +1,13 @@
+{
+  "name": "Sign2Text Offline",
+  "short_name": "Sign2Text",
+  "description": "Gesture recognition on your device",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f9ff",
+  "theme_color": "#164bff",
+  "icons": [
+    {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+.env
+.env.*
+.venv/
+venv/
+
+# Local Python environment, downloaded models, uploads and generated previews.
+work/
+outputs/
+app/recordings/
+*.mp4
+*.mov
+*.webm
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.task
+
+# Machine-specific desktop launcher bundle.
+Sign2Text.app/
+Sign2Text.command

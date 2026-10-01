@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#164bff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Sign2Text" />
+    <meta name="description" content="Simple hand gestures, turned into words on your device." />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Sign2Text Offline</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Sign2Text Offline home">
+        <span class="brand-mark" aria-hidden="true">S2</span>
+        <span>sign2text <b>offline</b></span>
+      </a>
+      <div class="topbar-actions">
+        <div class="locale-switch" role="group" aria-label="Interface language">
+          <button id="localeEn" type="button" lang="en" aria-pressed="false">EN</button>
+          <button id="localeRu" type="button" lang="ru" aria-pressed="true">RU</button>
+        </div>
+        <div class="privacy"><span aria-hidden="true"></span> Video stays on this device</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="workspace" aria-labelledby="workspace-title">
+        <div class="workspace-heading">
+          <div>
+            <p class="eyebrow" id="workspaceEyebrow">GESTURES → WORDS</p>
+            <h1 id="workspace-title">Your hands.<br />Your words.</h1>
+          </div>
+          <div class="model-state" id="modelState"><span></span> Connecting…</div>
+        </div>
+
+        <div class="grid">
+          <section class="capture-card" aria-label="Video capture">
+            <div class="language-switch" role="group" aria-label="Recognition mode">
+              <button id="gesturesMode" type="button" aria-pressed="true">Gestures</button>
+              <button id="aslMode" type="button" aria-pressed="false">ASL</button>
+            </div>
+            <div class="asl-submode" id="aslSubmode" role="group" aria-label="ASL signs" hidden>
+              <button id="aslNumbersMode" type="button" aria-pressed="true">Numbers · 1–9</button>
+              <button id="aslLettersMode" type="button" aria-pressed="false">Letters · A–Z</button>
+            </div>
+            <div class="video-stage" id="videoStage">
+              <video id="video" playsinline muted></video>
+              <canvas id="analysisCanvas" width="160" height="90" hidden></canvas>
+              <canvas id="liveCanvas" width="960" height="540" hidden></canvas>
+              <div class="camera-empty" id="cameraEmpty">
+                <div class="hand-glyph" aria-hidden="true">REC</div>
+                <h2>Ready when you are.</h2>
+                <p>Show your hand to the camera.</p>
+              </div>
+              <div class="frame-guide" aria-hidden="true"><span></span></div>
+              <div class="recording-badge" id="recordingBadge"><i></i> REC <b id="timer">0:00</b></div>
+            </div>
+
+            <div class="capture-actions">
+              <button class="button primary" id="cameraButton" type="button">Enable camera</button>
+              <button class="button record" id="recordButton" type="button" disabled>
+                <span aria-hidden="true"></span><b>Record</b>
+              </button>
+              <button class="button secondary" id="uploadButton" type="button">Choose video</button>
+              <input id="fileInput" type="file" accept="video/*" hidden />
+            </div>
+            <p class="hint" id="modeHint">Show one or two hands and hold still.</p>
+            <button class="button primary translate-button" id="translateButton" disabled type="button">Read gesture</button>
+            <button class="button secondary translate-button" id="saveButton" disabled type="button">Save video</button>
+            <p class="hint" id="clipStatus" role="status">Enable the camera to start.</p>
+          </section>
+
+          <aside class="result-card" aria-label="English result" aria-live="polite">
+            <div class="result-topline">
+              <p class="eyebrow">YOUR WORDS</p>
+              <span id="resultModeLabel">ENGLISH</span>
+            </div>
+            <div class="result-tabs" role="tablist" aria-label="Result view">
+              <button id="liveTab" type="button" role="tab" aria-controls="livePanel" aria-selected="true">Live</button>
+              <button id="historyTab" type="button" role="tab" aria-controls="historyPanel" aria-selected="false">All words</button>
+            </div>
+            <div id="livePanel" class="result-panel" role="tabpanel" aria-labelledby="liveTab">
+            <div class="result-empty" id="resultEmpty">
+              <div class="text-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+              <h2 id="result-title">Your words<br />appear here.</h2>
+              <p id="resultHint">Show a gesture from the guide.</p>
+            </div>
+            <div class="result-output" id="resultOutput" hidden>
+              <p id="exampleLabel" class="eyebrow" hidden>EXAMPLE · NOT A TRANSLATION</p>
+              <p id="modelWarning" class="model-warning" hidden></p>
+              <p class="translation" id="translationText"></p>
+              <div hidden>
+              <div class="confidence-row"><span>Confidence</span><b id="confidenceText">—</b></div>
+              <div class="confidence-track"><i id="confidenceBar"></i></div>
+              <dl class="metrics">
+                <div><dt>Latency</dt><dd id="latencyText">—</dd></div>
+                <div><dt>Model</dt><dd id="modelText">—</dd></div>
+              </dl>
+              </div>
+              <button class="copy-button" id="copyButton" type="button">Copy text</button>
+            </div>
+            <div class="model-required" id="modelRequired" hidden>
+              <strong>Preparing local translation.</strong>
+              <p>Keep this page open while your video is processed.</p>
+            </div>
+            </div>
+            <div id="historyPanel" class="result-panel history-panel" role="tabpanel" aria-labelledby="historyTab" hidden>
+              <div id="historyEmpty" class="result-empty">
+                <div class="text-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+                <h2>All your words<br />in one place.</h2>
+                <p id="historyEmptyHint">Recognized gestures will appear here in order.</p>
+              </div>
+              <div id="historyOutput" hidden>
+                <p class="history-text" id="historyText"></p>
+                <div class="history-actions">
+                  <button id="copyHistoryButton" class="copy-button" type="button">Copy all</button>
+                  <button id="clearHistoryButton" class="clear-history" type="button">Clear</button>
+                </div>
+              </div>
+              <div id="wordBuilderActions" class="word-builder-actions" hidden>
+                <button id="wordSpaceButton" type="button">Space</button>
+                <button id="wordRepeatButton" type="button" aria-label="Repeat last letter">Repeat</button>
+                <button id="wordBackspaceButton" type="button" aria-label="Remove last letter">⌫ Delete</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="guide-wrap" aria-label="Supported signs">
+        <div class="guide-heading"><p class="eyebrow" id="guideEyebrow">GESTURE GUIDE</p><h2 id="guideTitle">26 gestures to try</h2></div>
+        <div class="gesture-guide" id="gestureGuide"></div>
+      </section>
+      <details class="capture-details">
+        <summary>Recording check</summary>
+        <div class="quality-block">
+          <div class="quality-heading">
+            <div><p class="eyebrow">CLIP CHECK</p><h2>Capture quality</h2></div>
+            <span id="qualityState">No clip</span>
+          </div>
+          <div class="quality-grid">
+            <div><span>Light</span><b id="lightMetric">—</b><i><em id="lightBar"></em></i></div>
+            <div><span>Contrast</span><b id="contrastMetric">—</b><i><em id="contrastBar"></em></i></div>
+            <div><span>Motion</span><b id="motionMetric">—</b><i><em id="motionBar"></em></i></div>
+            <div><span>Duration</span><b id="durationMetric">—</b><i><em id="durationBar"></em></i></div>
+          </div>
+        </div>
+      </details>
+      <details class="about-details">
+        <summary>About Sign2Text</summary>
+        <p>Gestures mode uses app-defined meanings. ASL mode reads nine number signs or fingerspelling letters A–Z, not full sentences. J and Z require movement. Use the guide to form each handshape. All video processing stays on your device.</p>
+      </details>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="model-adapter.js"></script>
+    <script src="app.js"></script>
+    <script src="i18n.js"></script>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+{"id":"clean-001","reference":"Could I have a coffee please","prediction":"Could I have coffee please","latency_ms":382,"condition":"clean","mode":"pose"}
+{"id":"clean-002","reference":"Where is the restroom","prediction":"Where is the restroom","latency_ms":401,"condition":"clean","mode":"pose"}
+{"id":"dim-001","reference":"Could I have a coffee please","prediction":"I have coffee","latency_ms":448,"condition":"dim","mode":"pose"}
+{"id":"angle-001","reference":"Where is the restroom","prediction":"Where restroom","latency_ms":430,"condition":"side_angle","mode":"pose"}
